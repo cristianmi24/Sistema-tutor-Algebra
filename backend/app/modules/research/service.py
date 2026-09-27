@@ -243,6 +243,7 @@ async def timeline(db: AsyncSession, interactions: list[Interaction]) -> list[Ti
                     else None
                 ),
                 scaffold_decision=scaffold.decision if scaffold else None,
+                ai_interpretation=i.ai_interpretation,
                 client_meta=i.client_meta,
             )
         )

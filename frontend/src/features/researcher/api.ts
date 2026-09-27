@@ -50,6 +50,7 @@ export const timelineStepSchema = z.object({
   teacher_intervention: z.record(z.string(), z.unknown()).nullable(),
   system_interpretation: z.record(z.string(), z.unknown()).nullable().optional(),
   scaffold_decision: z.record(z.string(), z.unknown()).nullable().optional(),
+  ai_interpretation: z.record(z.string(), z.unknown()).nullable().optional(),
   client_meta: z.record(z.string(), z.unknown()),
 });
 export type TimelineStep = z.infer<typeof timelineStepSchema>;
@@ -151,7 +152,38 @@ function qs(params: Record<string, string | undefined>): string {
   return entries.length ? `?${new URLSearchParams(entries).toString()}` : "";
 }
 
+export const aiInteractionSchema = z.object({
+  id: z.string(),
+  session_id: z.string().nullable(),
+  interaction_id: z.string().nullable(),
+  scaffold_event_id: z.string().nullable(),
+  provider: z.string(),
+  model: z.string().nullable(),
+  purpose: z.string(),
+  prompt: z.record(z.string(), z.unknown()),
+  raw_output: z.string().nullable(),
+  validation: z.record(z.string(), z.unknown()),
+  approved: z.boolean(),
+  latency_ms: z.number().nullable(),
+  created_at: z.string(),
+});
+export type AIInteraction = z.infer<typeof aiInteractionSchema>;
+
+export const aiConfigSchema = z.object({
+  enabled: z.boolean(),
+  provider: z.string(),
+  model: z.string().nullable(),
+  timeout_ms: z.number(),
+  max_calls_per_session: z.number(),
+  key_configured: z.boolean(),
+  purposes: z.array(z.string()),
+  guarantees: z.array(z.string()),
+});
+export type AIConfig = z.infer<typeof aiConfigSchema>;
+
 export const researchApi = {
+  aiInteractions: () => request("/ai/interactions", z.array(aiInteractionSchema)),
+  aiConfig: () => request("/ai/config", aiConfigSchema),
   participants: () => request("/research/participants", z.array(participantSchema)),
   episodes: (params: { student_id?: string; session_id?: string; trigger?: string } = {}) => request(`/research/episodes${qs(params)}`, z.array(episodeSchema)),
   episode: (id: string) => request(`/research/episodes/${id}`, episodeDetailSchema),

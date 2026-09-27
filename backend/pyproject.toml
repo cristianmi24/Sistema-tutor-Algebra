@@ -24,7 +24,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Capa de IA opcional (LLM_PROVIDER=anthropic). La plataforma funciona completa sin ella.
+ai = ["anthropic>=1.8,<2.0"]
 dev = [
+  "anthropic>=1.8,<2.0",
   "pytest>=8.2,<10.0",
   "pytest-asyncio>=0.23,<2.0",
   "httpx>=0.27,<1.0",

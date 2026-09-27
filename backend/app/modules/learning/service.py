@@ -147,6 +147,34 @@ class TutorPolicy(Protocol):
     async def decide(self, db: AsyncSession, ctx: TutorContext) -> TutorOutcome: ...
 
 
+def _ai_on() -> bool:
+    from app.modules.ai.service import ai_enabled
+
+    return ai_enabled()
+
+
+async def enrich_with_ai_interpretation(
+    db: AsyncSession, session: LearningSession, task: Task, interaction: Interaction, text: str
+) -> None:
+    """Interpretación opcional (vocabulario cerrado, validada) de una explicación abierta. Solo para personal."""
+    from app.modules.ai.service import ai_enabled, current_settings, interpret_explanation
+
+    settings = current_settings()
+    if settings is None or not ai_enabled() or not text.strip():
+        return
+    outcome = await interpret_explanation(
+        db, settings, session=session, task=task, text=text, interaction_id=interaction.id
+    )
+    if outcome is None:
+        return
+    interaction.ai_interpretation = (
+        {**outcome.value, "ai_interaction_id": str(outcome.interaction_id)}
+        if outcome.approved
+        else {"approved": False, "ai_interaction_id": str(outcome.interaction_id), "reasons": outcome.reasons}
+    )
+    await db.flush()
+
+
 def student_label(state: StudentState) -> str:
     return STUDENT_FACING_STATE_LABELS[state]
 
@@ -225,7 +253,7 @@ async def deliver_scaffold(
         scaffold_type=scaffold.scaffold_type if scaffold else None,
         text=text,
         follow_up=str(scaffold.content.get("follow_up")) if scaffold and scaffold.content.get("follow_up") else None,
-        can_reformulate=bool(scaffold and scaffold.content.get("variants")),
+        can_reformulate=bool(scaffold and (scaffold.content.get("variants") or _ai_on())),
         message="Aquí tienes una pista. Puedes usarla, pedirla de otra forma o seguir por tu cuenta.",
     )
     return event, offer
@@ -396,7 +424,7 @@ async def record_client_event(db: AsyncSession, session: LearningSession, payloa
         student_response = {"text": str(payload.payload.get("text", ""))[:4000]}
     elif payload.payload:
         student_response = payload.payload
-    return await record_event(
+    event = await record_event(
         db,
         session,
         payload.event_type,
@@ -405,6 +433,9 @@ async def record_client_event(db: AsyncSession, session: LearningSession, payloa
         representation=payload.representation.value if payload.representation else None,
         client_meta=payload.client_meta,
     )
+    if payload.event_type == InteractionEventType.SELF_EXPLANATION and st is not None and student_response:
+        await enrich_with_ai_interpretation(db, session, st.task, event, str(student_response.get("text", "")))
+    return event
 
 
 # --------------------------------------------------------------------------- respuestas
@@ -491,6 +522,9 @@ async def submit_response(
             response_id=response.id,
             representation=payload.representation.value,
         )
+
+    if payload.representation.value == "VERBAL":
+        await enrich_with_ai_interpretation(db, session, task, interaction, str(payload.content.get("text", "")))
 
     await resolve_pending_scaffolds(db, session, task.id, evaluation, payload.representation.value)
 
@@ -618,14 +652,46 @@ async def scaffold_feedback(
             client_meta=client_meta,
         )
         return event, None
-    # REFORMULATE: variante del banco (Fase 7 podrá adaptar lenguaje con IA validada).
+    # REFORMULATE: primero IA opcional validada; si no está activa, falla o es rechazada → variante del banco.
     variants = list(event.scaffold.content.get("variants", [])) if event.scaffold else []
-    if not variants:
-        raise AppError("Esta ayuda no tiene otra formulación disponible.")
-    index = event.reformulations % len(variants)
-    text = str(variants[index])
+    original = str(event.scaffold.content.get("text", "")) if event.scaffold else (event.delivered_text or "")
+    text: str | None = None
+    ai_info: dict[str, Any] | None = None
+    from app.modules.ai.service import ai_enabled, current_settings, reformulate_hint
+
+    settings = current_settings()
+    if settings is not None and ai_enabled() and original:
+        task = await db.get(Task, event.task_id)
+        student = await db.get(Student, session.student_id)
+        if task is not None and student is not None:
+            outcome = await reformulate_hint(
+                db,
+                settings,
+                session=session,
+                task=task,
+                grade=student.grade,
+                original=original,
+                scaffold_type=event.scaffold.scaffold_type if event.scaffold else None,
+                scaffold_event_id=event.id,
+            )
+            if outcome is not None:
+                ai_info = {
+                    "ai_interaction_id": str(outcome.interaction_id),
+                    "approved": outcome.approved,
+                    "reasons": outcome.reasons,
+                }
+                if outcome.approved and isinstance(outcome.value, str):
+                    text = outcome.value
+    source = "AI_VALIDATED" if text is not None else "BANK_VARIANT"
+    if text is None:
+        if not variants:
+            raise AppError("Esta ayuda no tiene otra formulación disponible.")
+        text = str(variants[event.reformulations % len(variants)])
     event.reformulations += 1
     event.delivered_text = text
+    if source == "AI_VALIDATED":
+        event.source = "AI_VALIDATED"
+        event.decision = {**event.decision, "validation_status": "APPROVED"}
     await record_event(
         db,
         session,
@@ -636,6 +702,7 @@ async def scaffold_feedback(
         help_content=text,
         scaffold_event_id=event.id,
         client_meta=client_meta,
+        ai_interpretation={"reformulation_source": source, **(ai_info or {})},
     )
     offer = HelpOffer(
         scaffold_event_id=event.id,
@@ -643,7 +710,7 @@ async def scaffold_feedback(
         level=event.current_help_level,
         scaffold_type=event.scaffold.scaffold_type if event.scaffold else None,
         text=text,
-        can_reformulate=event.reformulations < len(variants),
+        can_reformulate=ai_enabled() or event.reformulations < len(variants),
         message="Aquí está la misma idea dicha de otra forma.",
     )
     return event, offer

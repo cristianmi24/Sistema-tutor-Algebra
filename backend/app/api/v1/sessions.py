@@ -296,7 +296,11 @@ async def interactions(
     session_id: uuid.UUID, user: AnyUserDep, db: DbDep, task_id: uuid.UUID | None = None
 ) -> list[InteractionOut]:
     session = await _accessible_session(db, user, session_id)
-    return [interaction_out(i) for i in await service.session_interactions(db, session.id, task_id=task_id)]
+    rows = [interaction_out(i) for i in await service.session_interactions(db, session.id, task_id=task_id)]
+    if user.role == Role.STUDENT:
+        # Las interpretaciones (sistema o IA) nunca se muestran al estudiante.
+        rows = [r.model_copy(update={"ai_interpretation": None}) for r in rows]
+    return rows
 
 
 @router.get("/{session_id}/responses", response_model=list[ResponseOut], summary="Respuestas de la sesión")

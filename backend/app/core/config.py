@@ -74,8 +74,9 @@ class Settings(BaseSettings):
 
     # --- IA opcional ---------------------------------------------------------
     llm_enabled: bool = False
-    llm_provider: Literal["null", "anthropic", "openai_compatible"] = "null"
-    llm_model: str | None = None
+    # "fake" solo para pruebas automatizadas (rechazado en producción).
+    llm_provider: Literal["null", "anthropic", "fake"] = "null"
+    llm_model: str = "claude-opus-5"
     llm_api_key: str | None = None
     llm_timeout_ms: int = 8000
     llm_max_calls_per_session: int = 20
@@ -118,8 +119,10 @@ class Settings(BaseSettings):
                 problems.append("JWT_SECRET_KEY debe ser un secreto aleatorio de ≥ 32 caracteres")
             if any(origin.startswith("http://") for origin in self.cors_origins):
                 problems.append("CORS_ORIGINS no debe incluir orígenes http:// en producción")
-            if self.llm_enabled and not self.llm_api_key:
-                problems.append("LLM_ENABLED=true requiere LLM_API_KEY")
+            if self.llm_enabled and self.llm_provider == "anthropic" and not self.llm_api_key:
+                problems.append("LLM_PROVIDER=anthropic requiere LLM_API_KEY")
+            if self.llm_provider == "fake":
+                problems.append("LLM_PROVIDER=fake solo está permitido en pruebas")
             if problems:
                 raise ValueError("Configuración insegura para producción: " + "; ".join(problems))
         return self

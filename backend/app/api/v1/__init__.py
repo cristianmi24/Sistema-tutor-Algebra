@@ -2,7 +2,21 @@
 
 from fastapi import APIRouter
 
-from app.api.v1 import admin, auth, catalog, consents, health, legal, meta, research, sessions, tasks, teacher, tutor
+from app.api.v1 import (
+    admin,
+    ai,
+    auth,
+    catalog,
+    consents,
+    health,
+    legal,
+    meta,
+    research,
+    sessions,
+    tasks,
+    teacher,
+    tutor,
+)
 
 api_router = APIRouter()
 api_router.include_router(health.router, prefix="/health", tags=["health"])
@@ -17,4 +31,5 @@ api_router.include_router(catalog.router, prefix="/catalog", tags=["catalog"])
 api_router.include_router(tutor.router, prefix="", tags=["tutor"])
 api_router.include_router(research.router, prefix="/research", tags=["research"])
 api_router.include_router(teacher.router, prefix="/teacher", tags=["teacher"])
+api_router.include_router(ai.router, prefix="/ai", tags=["ai"])
 api_router.include_router(teacher.student_router, prefix="/sessions", tags=["sessions"])

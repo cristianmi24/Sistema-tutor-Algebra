@@ -10,6 +10,7 @@ import { ForgotPasswordPage } from "@/features/auth/pages/ForgotPasswordPage";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { RegisterPage } from "@/features/auth/pages/RegisterPage";
 import { ResetPasswordPage } from "@/features/auth/pages/ResetPasswordPage";
+import { AIAuditPage } from "@/features/researcher/pages/AIAuditPage";
 import { ComparePage } from "@/features/researcher/pages/ComparePage";
 import { EpisodeDetailPage } from "@/features/researcher/pages/EpisodeDetailPage";
 import { EpisodesPage } from "@/features/researcher/pages/EpisodesPage";
@@ -87,6 +88,7 @@ export const routes: RouteObject[] = [
               { path: "/researcher/memos", element: <MemosPage /> },
               { path: "/researcher/interviews", element: <InterviewsPage /> },
               { path: "/researcher/export", element: <ExportPage /> },
+              { path: "/researcher/ai", element: <AIAuditPage /> },
               { path: "/researcher/*", element: <ResearcherDashboardPage /> },
             ],
           },
@@ -99,6 +101,7 @@ export const routes: RouteObject[] = [
               { path: "/admin/audit", element: <AdminAuditPage /> },
               { path: "/admin/rules", element: <AdminRulesPage /> },
               { path: "/admin/catalog", element: <AdminCatalogPage /> },
+              { path: "/admin/ai", element: <AIAuditPage /> },
               { path: "/admin/*", element: <AdminDashboardPage /> },
             ],
           },

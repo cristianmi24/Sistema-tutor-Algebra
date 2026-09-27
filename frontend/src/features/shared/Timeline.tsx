@@ -80,6 +80,15 @@ export function Timeline({ steps, showInterpretation = true }: { steps: Timeline
                   </p>
                 </details>
               )}
+              {showInterpretation && step.ai_interpretation && Array.isArray(step.ai_interpretation.dimensions) && (
+                <details className="timeline__details">
+                  <summary className="text-caption">Interpretación asistida por IA (validada; no es una categoría teórica)</summary>
+                  <p className="text-caption">
+                    {(step.ai_interpretation.dimensions as string[]).join(", ") || "sin dimensiones"} · confianza {asText(step.ai_interpretation.confidence)}
+                  </p>
+                </details>
+              )}
+              {step.ai_interpretation?.reformulation_source === "AI_VALIDATED" && <p className="text-caption">Reformulación generada por IA y validada.</p>}
               {showInterpretation && step.scaffold_decision && (
                 <details className="timeline__details">
                   <summary className="text-caption">Por qué intervino el sistema</summary>

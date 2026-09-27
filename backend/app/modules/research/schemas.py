@@ -63,6 +63,9 @@ class TimelineStep(BaseModel):
         description="Interpretación operativa del sistema (estado estimado, regla). No es una categoría teórica.",
     )
     scaffold_decision: dict[str, Any] | None = None
+    ai_interpretation: dict[str, Any] | None = Field(
+        default=None, description="Propuesta de IA validada (vocabulario cerrado) o fuente de la reformulación."
+    )
     client_meta: dict[str, Any]
 
 

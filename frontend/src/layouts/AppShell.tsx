@@ -12,6 +12,7 @@ import {
   NotebookPen,
   Settings2,
   ShieldCheck,
+  Sparkles,
   Users,
 } from "lucide-react";
 import type { ComponentType } from "react";
@@ -49,6 +50,7 @@ const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     { to: "/researcher/memos", label: "Memos", icon: NotebookPen },
     { to: "/researcher/interviews", label: "Entrevistas", icon: MessageSquareText },
     { to: "/researcher/export", label: "Exportar", icon: Database },
+    { to: "/researcher/ai", label: "IA (trazas)", icon: Sparkles },
   ],
   ADMIN: [
     { to: "/admin", label: "Inicio", icon: Home, end: true },
@@ -56,6 +58,7 @@ const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     { to: "/admin/institutions", label: "Instituciones", icon: Building2 },
     { to: "/admin/catalog", label: "Actividades y ayudas", icon: FlaskConical },
     { to: "/admin/rules", label: "Reglas", icon: Settings2 },
+    { to: "/admin/ai", label: "IA opcional", icon: Sparkles },
     { to: "/admin/audit", label: "Auditoría", icon: ShieldCheck },
   ],
 };
