@@ -12,6 +12,7 @@ import { HelpPanel } from "../components/HelpPanel";
 import { PatternView } from "../components/PatternView";
 import { QuestionBlock, type ResponseDraft } from "../components/ResolutionSpace";
 import { SelfExplanation } from "../components/SelfExplanation";
+import { TeacherMessages } from "../components/TeacherMessages";
 import { useInteractionLogger } from "../hooks/useInteractionLogger";
 
 /**
@@ -123,6 +124,8 @@ export function ActivityPage() {
           </div>
         }
       />
+
+      <TeacherMessages sessionId={sessionId} taskId={taskId} />
 
       <Card title="Tarea">
         <p className="activity__prompt">{task.statement.prompt}</p>

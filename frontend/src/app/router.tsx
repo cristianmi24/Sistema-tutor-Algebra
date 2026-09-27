@@ -24,6 +24,7 @@ import { StudentDashboardPage } from "@/features/student/pages/StudentDashboardP
 import { StudentProgressPage } from "@/features/student/pages/StudentProgressPage";
 import { StudentSessionPage } from "@/features/student/pages/StudentSessionPage";
 import { TeacherDashboardPage } from "@/features/teacher/pages/TeacherDashboardPage";
+import { TeacherSessionPage } from "@/features/teacher/pages/TeacherSessionPage";
 import { AppShell } from "@/layouts/AppShell";
 import { AuthLayout } from "@/layouts/AuthLayout";
 import { NotFoundPage } from "@/layouts/NotFoundPage";
@@ -64,7 +65,17 @@ export const routes: RouteObject[] = [
               { path: "/student/*", element: <StudentDashboardPage /> },
             ],
           },
-          { element: <RequireRole roles={["TEACHER"]} />, children: [{ path: "/teacher/*", element: <TeacherDashboardPage /> }] },
+          {
+            element: <RequireRole roles={["TEACHER"]} />,
+            children: [
+              { path: "/teacher", element: <TeacherDashboardPage /> },
+              { path: "/teacher/sessions/:sessionId", element: <TeacherSessionPage /> },
+              { path: "/teacher/episodes", element: <EpisodesPage /> },
+              { path: "/teacher/episodes/:episodeId", element: <EpisodeDetailPage /> },
+              { path: "/teacher/export", element: <ExportPage /> },
+              { path: "/teacher/*", element: <TeacherDashboardPage /> },
+            ],
+          },
           {
             element: <RequireRole roles={["RESEARCHER"]} />,
             children: [

@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
 
 import { Alert, Badge, Card, PageHeader, Skeleton } from "@/design-system/components";
+import { useSession } from "@/features/auth/session-store";
 import { Timeline } from "@/features/shared/Timeline";
 import { errorMessage } from "@/lib/api";
 import { asText } from "@/lib/text";
@@ -11,6 +12,8 @@ import { MemoEditor } from "../components/MemoEditor";
 
 export function EpisodeDetailPage() {
   const { episodeId = "" } = useParams();
+  const { user } = useSession();
+  const isResearcher = user?.role === "RESEARCHER";
   const episode = useQuery({ queryKey: researchQueryKeys.episode(episodeId), queryFn: () => researchApi.episode(episodeId) });
   if (episode.isPending) return <Skeleton height="12rem" />;
   if (episode.isError) return <Alert tone="error">{errorMessage(episode.error)}</Alert>;
@@ -25,9 +28,11 @@ export function EpisodeDetailPage() {
         title={e.task_title ?? "Episodio"}
         description={asText(task?.prompt, "")}
         actions={
-          <Link to={`/researcher/compare?a=${e.id}`} className="ds-button ds-button--secondary ds-button--md">
-            Comparar con otro episodio
-          </Link>
+          isResearcher && (
+            <Link to={`/researcher/compare?a=${e.id}`} className="ds-button ds-button--secondary ds-button--md">
+              Comparar con otro episodio
+            </Link>
+          )
         }
       />
       <div className="ds-stack">
@@ -62,13 +67,15 @@ export function EpisodeDetailPage() {
                       </Badge>
                     )}
                   </summary>
-                  <MemoEditor memo={m} />
+                  {isResearcher ? <MemoEditor memo={m} /> : <p>{m.observation}</p>}
                 </details>
               ))}
             </Card>
-            <Card title="Nuevo memo">
-              <MemoEditor episodeId={e.id} participantCode={e.participant_code} />
-            </Card>
+            {isResearcher && (
+              <Card title="Nuevo memo">
+                <MemoEditor episodeId={e.id} participantCode={e.participant_code} />
+              </Card>
+            )}
           </div>
         </div>
       </div>

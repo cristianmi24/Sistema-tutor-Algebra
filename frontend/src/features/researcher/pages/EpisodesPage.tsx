@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 
 import { Alert, Badge, Card, EmptyState, PageHeader, Select, Skeleton } from "@/design-system/components";
 import { errorMessage } from "@/lib/api";
@@ -8,6 +8,7 @@ import { TRIGGER_LABEL, researchApi, researchQueryKeys } from "../api";
 
 export function EpisodesPage() {
   const [params, setParams] = useSearchParams();
+  const base = useLocation().pathname.startsWith("/teacher") ? "/teacher" : "/researcher";
   const filters = {
     ...(params.get("student") ? { student_id: params.get("student") ?? "" } : {}),
     ...(params.get("session") ? { session_id: params.get("session") ?? "" } : {}),
@@ -80,7 +81,7 @@ export function EpisodesPage() {
                       <td>{e.status === "OPEN" ? <Badge tone="success">abierto</Badge> : (e.close_reason ?? "—")}</td>
                       <td>{new Date(e.created_at).toLocaleString("es-CO")}</td>
                       <td>
-                        <Link to={`/researcher/episodes/${e.id}`}>Abrir</Link>
+                        <Link to={`${base}/episodes/${e.id}`}>Abrir</Link>
                       </td>
                     </tr>
                   );

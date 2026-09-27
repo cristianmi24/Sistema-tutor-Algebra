@@ -38,10 +38,8 @@ const NAV_BY_ROLE: Record<Role, NavItem[]> = {
   ],
   TEACHER: [
     { to: "/teacher", label: "Inicio", icon: Home, end: true },
-    { to: "/teacher/groups", label: "Grupos", icon: Users },
-    { to: "/teacher/sessions", label: "Sesiones", icon: BookOpenCheck },
-    { to: "/teacher/interventions", label: "Intervenciones", icon: MessageSquareText },
     { to: "/teacher/episodes", label: "Episodios", icon: ClipboardList },
+    { to: "/teacher/export", label: "Exportar", icon: Database },
   ],
   RESEARCHER: [
     { to: "/researcher", label: "Participantes", icon: Users, end: true },
