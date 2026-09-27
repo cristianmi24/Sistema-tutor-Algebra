@@ -1,8 +1,10 @@
 import { type RouteObject, createBrowserRouter, createMemoryRouter } from "react-router-dom";
 
 import { AdminAuditPage } from "@/features/admin/pages/AdminAuditPage";
+import { AdminCatalogPage } from "@/features/admin/pages/AdminCatalogPage";
 import { AdminDashboardPage } from "@/features/admin/pages/AdminDashboardPage";
 import { AdminInstitutionsPage } from "@/features/admin/pages/AdminInstitutionsPage";
+import { AdminRulesPage } from "@/features/admin/pages/AdminRulesPage";
 import { AdminUsersPage } from "@/features/admin/pages/AdminUsersPage";
 import { ForgotPasswordPage } from "@/features/auth/pages/ForgotPasswordPage";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
@@ -67,6 +69,8 @@ export const routes: RouteObject[] = [
               { path: "/admin/users", element: <AdminUsersPage /> },
               { path: "/admin/institutions", element: <AdminInstitutionsPage /> },
               { path: "/admin/audit", element: <AdminAuditPage /> },
+              { path: "/admin/rules", element: <AdminRulesPage /> },
+              { path: "/admin/catalog", element: <AdminCatalogPage /> },
               { path: "/admin/*", element: <AdminDashboardPage /> },
             ],
           },

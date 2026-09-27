@@ -568,3 +568,6 @@ async def seed_catalog(db: AsyncSession) -> None:
         if await db.scalar(select(Scaffold.id).where(Scaffold.code == spec["code"])) is None:
             db.add(Scaffold(reviewed_by="equipo pedagógico (semilla)", **spec))
     await db.flush()
+    from app.seed.tutor_config import seed_tutor_config
+
+    await seed_tutor_config(db)

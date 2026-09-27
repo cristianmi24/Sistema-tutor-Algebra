@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-from app.api.v1 import admin, auth, catalog, consents, health, legal, meta, sessions, tasks
+from app.api.v1 import admin, auth, catalog, consents, health, legal, meta, sessions, tasks, tutor
 
 api_router = APIRouter()
 api_router.include_router(health.router, prefix="/health", tags=["health"])
@@ -14,3 +14,4 @@ api_router.include_router(admin.router, prefix="/admin", tags=["admin"])
 api_router.include_router(tasks.router, prefix="/tasks", tags=["tasks"])
 api_router.include_router(sessions.router, prefix="/sessions", tags=["sessions"])
 api_router.include_router(catalog.router, prefix="/catalog", tags=["catalog"])
+api_router.include_router(tutor.router, prefix="", tags=["tutor"])

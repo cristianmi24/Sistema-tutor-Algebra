@@ -203,8 +203,9 @@ async def test_help_request_accept_reject_and_reformulate(
     )
     assert offer.status_code == 200, offer.text
     body = offer.json()
-    assert body["offered"] is True and body["level"] == 1
-    assert body["text"] and "3n" not in body["text"] and "3*n" not in body["text"]
+    # El motor adaptativo atiende la solicitud explícita con la menor orientación útil (nivel 1–2).
+    assert body["offered"] is True and body["level"] in (1, 2)
+    assert body["text"] and "3n" not in body["text"] and "3*n" not in body["text"] and "14" not in body["text"]
     event_id = body["scaffold_event_id"]
 
     reformulated = await client.post(

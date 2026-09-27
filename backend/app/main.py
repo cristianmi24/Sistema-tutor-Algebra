@@ -19,6 +19,8 @@ from app.core.logging import configure_logging, get_logger
 from app.core.middleware import register_middleware
 from app.core.ratelimit import register_rate_limiting
 from app.modules.identity.email import build_email_sender
+from app.modules.learning.service import set_tutor_policy_factory
+from app.modules.tutor.orchestrator import AdaptivePolicy
 
 log = get_logger(__name__)
 
@@ -59,6 +61,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app.state.settings = settings
     app.state.email_sender = build_email_sender(settings)
+    set_tutor_policy_factory(lambda: AdaptivePolicy(settings))
     register_middleware(app, settings)
     register_rate_limiting(app, settings)
     register_error_handlers(app)

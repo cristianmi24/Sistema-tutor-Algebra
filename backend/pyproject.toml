@@ -59,6 +59,7 @@ ignore = ["S101", "RUF012", "B008", "RUF001", "RUF002", "RUF003"]  # B008: patr√
 "tests/*" = ["S", "ASYNC"]
 "alembic/*" = ["N999", "E501"]
 "app/seed/*" = ["E501"]
+"app/modules/tutor/defaults.py" = ["E501"]
 
 [tool.mypy]
 python_version = "3.11"
