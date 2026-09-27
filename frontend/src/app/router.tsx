@@ -10,7 +10,10 @@ import { RegisterPage } from "@/features/auth/pages/RegisterPage";
 import { ResetPasswordPage } from "@/features/auth/pages/ResetPasswordPage";
 import { ResearcherDashboardPage } from "@/features/researcher/pages/ResearcherDashboardPage";
 import { StatusPage } from "@/features/status/StatusPage";
+import { ActivityPage } from "@/features/student/pages/ActivityPage";
 import { StudentDashboardPage } from "@/features/student/pages/StudentDashboardPage";
+import { StudentProgressPage } from "@/features/student/pages/StudentProgressPage";
+import { StudentSessionPage } from "@/features/student/pages/StudentSessionPage";
 import { TeacherDashboardPage } from "@/features/teacher/pages/TeacherDashboardPage";
 import { AppShell } from "@/layouts/AppShell";
 import { AuthLayout } from "@/layouts/AuthLayout";
@@ -41,7 +44,17 @@ export const routes: RouteObject[] = [
       {
         element: <AppShell />,
         children: [
-          { element: <RequireRole roles={["STUDENT"]} />, children: [{ path: "/student/*", element: <StudentDashboardPage /> }] },
+          {
+            element: <RequireRole roles={["STUDENT"]} />,
+            children: [
+              { path: "/student", element: <StudentDashboardPage /> },
+              { path: "/student/sessions", element: <StudentDashboardPage /> },
+              { path: "/student/sessions/:sessionId", element: <StudentSessionPage /> },
+              { path: "/student/sessions/:sessionId/tasks/:taskId", element: <ActivityPage /> },
+              { path: "/student/progress", element: <StudentProgressPage /> },
+              { path: "/student/*", element: <StudentDashboardPage /> },
+            ],
+          },
           { element: <RequireRole roles={["TEACHER"]} />, children: [{ path: "/teacher/*", element: <TeacherDashboardPage /> }] },
           {
             element: <RequireRole roles={["RESEARCHER"]} />,

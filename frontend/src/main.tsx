@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 
 import "@/design-system/index.css";
 import "@/layouts/layouts.css";
+import "@/features/student/student.css";
 
 import { App } from "@/app/App";
 

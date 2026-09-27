@@ -6,6 +6,7 @@ Cada fase añade aquí sus módulos de modelos.
 
 from app.core.database import Base
 from app.modules.identity import models as identity_models
+from app.modules.learning import models as learning_models
 from app.modules.ops import models as ops_models
 
-__all__ = ["Base", "identity_models", "ops_models"]
+__all__ = ["Base", "identity_models", "learning_models", "ops_models"]
