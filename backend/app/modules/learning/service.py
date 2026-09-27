@@ -112,6 +112,10 @@ async def record_event(
     )
     db.add(row)
     await db.flush()
+    # Episodios de investigación (import tardío para evitar dependencia circular entre módulos).
+    from app.modules.research.episodes import track_event
+
+    await track_event(db, session, row)
     return row
 
 

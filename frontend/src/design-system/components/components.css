@@ -459,3 +459,79 @@
   font-weight: var(--font-weight-semibold);
   font-variant-numeric: tabular-nums;
 }
+
+/* ---------- Timeline (investigación / docente) ---------- */
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+  position: relative;
+}
+
+.timeline__item {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: var(--space-3);
+}
+
+.timeline__marker {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-muted);
+}
+
+.timeline__item--system .timeline__marker {
+  background: var(--color-info-soft);
+  border-color: var(--color-info);
+  color: var(--color-info);
+}
+
+.timeline__item--teacher .timeline__marker {
+  background: var(--color-teacher-soft);
+  border-color: var(--color-teacher);
+  color: var(--color-teacher);
+}
+
+.timeline__body {
+  display: grid;
+  gap: var(--space-1);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.timeline__details summary {
+  cursor: pointer;
+}
+
+.compare-grid {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.6fr) 1fr 1fr;
+  gap: var(--space-2) var(--space-4);
+  align-items: start;
+}
+
+.compare-grid__head {
+  font-weight: var(--font-weight-semibold);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.compare-grid pre {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: inherit;
+  font-size: var(--font-size-caption);
+}
+
+@media (max-width: 720px) {
+  .compare-grid {
+    grid-template-columns: 1fr;
+  }
+}

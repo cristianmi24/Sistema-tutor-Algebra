@@ -10,7 +10,14 @@ import { ForgotPasswordPage } from "@/features/auth/pages/ForgotPasswordPage";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { RegisterPage } from "@/features/auth/pages/RegisterPage";
 import { ResetPasswordPage } from "@/features/auth/pages/ResetPasswordPage";
+import { ComparePage } from "@/features/researcher/pages/ComparePage";
+import { EpisodeDetailPage } from "@/features/researcher/pages/EpisodeDetailPage";
+import { EpisodesPage } from "@/features/researcher/pages/EpisodesPage";
+import { ExportPage } from "@/features/researcher/pages/ExportPage";
+import { InterviewsPage } from "@/features/researcher/pages/InterviewsPage";
+import { MemosPage } from "@/features/researcher/pages/MemosPage";
 import { ResearcherDashboardPage } from "@/features/researcher/pages/ResearcherDashboardPage";
+import { ResearcherSessionsPage } from "@/features/researcher/pages/ResearcherSessionsPage";
 import { StatusPage } from "@/features/status/StatusPage";
 import { ActivityPage } from "@/features/student/pages/ActivityPage";
 import { StudentDashboardPage } from "@/features/student/pages/StudentDashboardPage";
@@ -60,7 +67,17 @@ export const routes: RouteObject[] = [
           { element: <RequireRole roles={["TEACHER"]} />, children: [{ path: "/teacher/*", element: <TeacherDashboardPage /> }] },
           {
             element: <RequireRole roles={["RESEARCHER"]} />,
-            children: [{ path: "/researcher/*", element: <ResearcherDashboardPage /> }],
+            children: [
+              { path: "/researcher", element: <ResearcherDashboardPage /> },
+              { path: "/researcher/sessions", element: <ResearcherSessionsPage /> },
+              { path: "/researcher/episodes", element: <EpisodesPage /> },
+              { path: "/researcher/episodes/:episodeId", element: <EpisodeDetailPage /> },
+              { path: "/researcher/compare", element: <ComparePage /> },
+              { path: "/researcher/memos", element: <MemosPage /> },
+              { path: "/researcher/interviews", element: <InterviewsPage /> },
+              { path: "/researcher/export", element: <ExportPage /> },
+              { path: "/researcher/*", element: <ResearcherDashboardPage /> },
+            ],
           },
           {
             element: <RequireRole roles={["ADMIN"]} />,

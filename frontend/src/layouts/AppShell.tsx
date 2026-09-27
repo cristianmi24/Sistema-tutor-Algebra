@@ -49,6 +49,7 @@ const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     { to: "/researcher/episodes", label: "Episodios", icon: ClipboardList },
     { to: "/researcher/compare", label: "Comparar", icon: GitCompare },
     { to: "/researcher/memos", label: "Memos", icon: NotebookPen },
+    { to: "/researcher/interviews", label: "Entrevistas", icon: MessageSquareText },
     { to: "/researcher/export", label: "Exportar", icon: Database },
   ],
   ADMIN: [
