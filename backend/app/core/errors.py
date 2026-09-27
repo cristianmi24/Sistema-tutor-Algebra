@@ -92,14 +92,11 @@ def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(RequestValidationError)
     async def _validation_error(_: Request, exc: RequestValidationError) -> JSONResponse:
         details = [
-            {"loc": list(err.get("loc", [])), "msg": err.get("msg"), "type": err.get("type")}
-            for err in exc.errors()
+            {"loc": list(err.get("loc", [])), "msg": err.get("msg"), "type": err.get("type")} for err in exc.errors()
         ]
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            content=error_payload(
-                "VALIDATION_ERROR", "Los datos enviados no son válidos.", details
-            ),
+            content=error_payload("VALIDATION_ERROR", "Los datos enviados no son válidos.", details),
         )
 
     @app.exception_handler(StarletteHTTPException)

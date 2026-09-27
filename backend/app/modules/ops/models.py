@@ -43,9 +43,7 @@ class AuditLog(UUIDPrimaryKeyMixin, Base):
     request_id: Mapped[str | None] = mapped_column(String(64))
     ip_truncated: Mapped[str | None] = mapped_column(String(45))
     user_agent: Mapped[str | None] = mapped_column(String(255))
-    details: Mapped[dict[str, Any]] = mapped_column(
-        JSONB, nullable=False, server_default=text("'{}'::jsonb")
-    )
+    details: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, server_default=text("'{}'::jsonb"))
 
 
 class SystemSetting(Base):
@@ -56,6 +54,4 @@ class SystemSetting(Base):
     value: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     description: Mapped[str | None] = mapped_column(Text)
     updated_by: Mapped[uuid.UUID | None] = mapped_column()
-    updated_at: Mapped[datetime] = mapped_column(
-        server_default=text("now()"), onupdate=text("now()"), nullable=False
-    )
+    updated_at: Mapped[datetime] = mapped_column(server_default=text("now()"), onupdate=text("now()"), nullable=False)

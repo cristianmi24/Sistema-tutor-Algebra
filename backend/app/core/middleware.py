@@ -34,13 +34,9 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self._hsts = hsts
 
-    async def dispatch(
-        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         incoming = request.headers.get(REQUEST_ID_HEADER, "")
-        request_id = (
-            incoming if 0 < len(incoming) <= 64 and incoming.isprintable() else uuid.uuid4().hex
-        )
+        request_id = incoming if 0 < len(incoming) <= 64 and incoming.isprintable() else uuid.uuid4().hex
         token = request_id_ctx.set(request_id)
         started = time.perf_counter()
         try:
@@ -53,9 +49,7 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
         for header, value in SECURITY_HEADERS.items():
             response.headers.setdefault(header, value)
         if self._hsts:
-            response.headers.setdefault(
-                "Strict-Transport-Security", "max-age=31536000; includeSubDomains"
-            )
+            response.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
 
         log.info(
             "http_request",

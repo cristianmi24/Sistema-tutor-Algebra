@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type ReactNode, useState } from "react";
 
-import { SessionProvider } from "@/features/auth/session-store";
+import { type SessionState, SessionProvider } from "@/features/auth/session-store";
 import { ApiError } from "@/lib/api";
 
 export function createQueryClient(): QueryClient {
@@ -20,11 +20,11 @@ export function createQueryClient(): QueryClient {
   });
 }
 
-export function AppProviders({ children, queryClient }: { children: ReactNode; queryClient?: QueryClient }) {
+export function AppProviders({ children, queryClient, session }: { children: ReactNode; queryClient?: QueryClient; session?: SessionState }) {
   const [client] = useState(() => queryClient ?? createQueryClient());
   return (
     <QueryClientProvider client={client}>
-      <SessionProvider>{children}</SessionProvider>
+      <SessionProvider {...(session ? { initialState: session } : {})}>{children}</SessionProvider>
     </QueryClientProvider>
   );
 }

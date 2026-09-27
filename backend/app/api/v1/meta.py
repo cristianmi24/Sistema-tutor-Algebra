@@ -36,9 +36,7 @@ async def meta(settings: SettingsDep) -> MetaResponse:
     return MetaResponse(
         roles=enums.values(enums.Role),
         student_states=enums.values(enums.StudentState),
-        student_state_labels={
-            state.value: label for state, label in enums.STUDENT_FACING_STATE_LABELS.items()
-        },
+        student_state_labels={state.value: label for state, label in enums.STUDENT_FACING_STATE_LABELS.items()},
         intervention_levels=enums.values(enums.InterventionLevel),
         task_types=enums.values(enums.TaskType),
         worked_example_types=enums.values(enums.WorkedExampleType),

@@ -17,6 +17,8 @@ from app.core.database import build_engine, build_session_factory
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging, get_logger
 from app.core.middleware import register_middleware
+from app.core.ratelimit import register_rate_limiting
+from app.modules.identity.email import build_email_sender
 
 log = get_logger(__name__)
 
@@ -56,7 +58,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
 
     app.state.settings = settings
+    app.state.email_sender = build_email_sender(settings)
     register_middleware(app, settings)
+    register_rate_limiting(app, settings)
     register_error_handlers(app)
     app.include_router(api_router, prefix=settings.api_prefix)
     return app

@@ -25,8 +25,15 @@ export default tseslint.config(
       ],
       "@typescript-eslint/consistent-type-imports": ["error", { fixStyle: "inline-type-imports" }],
       "@typescript-eslint/no-unnecessary-condition": "off",
+      // react-hook-form: onSubmit={handleSubmit(...)} devuelve una promesa por diseño.
+      "@typescript-eslint/no-misused-promises": ["error", { checksVoidReturn: { attributes: false } }],
+      "@typescript-eslint/require-await": "off",
       "@typescript-eslint/restrict-template-expressions": ["error", { allowNumber: true }],
     },
+  },
+  {
+    files: ["src/test/**", "**/*.test.{ts,tsx}"],
+    rules: { "react-refresh/only-export-components": "off" },
   },
   {
     files: ["eslint.config.js", "vite.config.ts"],

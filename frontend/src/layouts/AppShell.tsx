@@ -1,5 +1,6 @@
 import {
   BookOpenCheck,
+  Building2,
   ClipboardList,
   Database,
   FlaskConical,
@@ -53,6 +54,7 @@ const NAV_BY_ROLE: Record<Role, NavItem[]> = {
   ADMIN: [
     { to: "/admin", label: "Inicio", icon: Home, end: true },
     { to: "/admin/users", label: "Usuarios", icon: Users },
+    { to: "/admin/institutions", label: "Instituciones", icon: Building2 },
     { to: "/admin/catalog", label: "Actividades y ayudas", icon: FlaskConical },
     { to: "/admin/rules", label: "Reglas", icon: Settings2 },
     { to: "/admin/audit", label: "Auditoría", icon: ShieldCheck },
@@ -73,8 +75,7 @@ export function AppShell() {
   const items = NAV_BY_ROLE[role];
 
   const handleSignOut = () => {
-    signOut();
-    void navigate("/login", { replace: true });
+    void signOut().then(() => navigate("/login", { replace: true }));
   };
 
   return (
@@ -104,7 +105,7 @@ export function AppShell() {
           <Badge tone="primary">{ROLE_LABEL[role]}</Badge>
           <div className="shell__user">
             <span className="text-label tabular" aria-label="Código de usuario">
-              {user?.displayCode ?? "—"}
+              {user?.display_code ?? "—"}
             </span>
             <Button variant="ghost" size="sm" leadingIcon={<LogOut size={16} aria-hidden />} onClick={handleSignOut}>
               Salir

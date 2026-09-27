@@ -78,13 +78,9 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.Column("id", sa.UUID(), server_default=sa.text("gen_random_uuid()"), nullable=False),
-        sa.CheckConstraint(
-            "kind IN ('PRIVACY_POLICY', 'TERMS')", name=op.f("ck_legal_documents_kind_allowed")
-        ),
+        sa.CheckConstraint("kind IN ('PRIVACY_POLICY', 'TERMS')", name=op.f("ck_legal_documents_kind_allowed")),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_legal_documents")),
-        sa.UniqueConstraint(
-            "kind", "version", "locale", name=op.f("uq_legal_documents_kind_version_locale")
-        ),
+        sa.UniqueConstraint("kind", "version", "locale", name=op.f("uq_legal_documents_kind_version_locale")),
         schema="identity",
     )
     op.create_table(
@@ -118,9 +114,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id", name=op.f("pk_audit_logs")),
         schema="ops",
     )
-    op.create_index(
-        "ix_ops_audit_logs_action", "audit_logs", ["action"], unique=False, schema="ops"
-    )
+    op.create_index("ix_ops_audit_logs_action", "audit_logs", ["action"], unique=False, schema="ops")
     op.create_index(
         "ix_ops_audit_logs_actor_occurred",
         "audit_logs",
@@ -128,9 +122,7 @@ def upgrade() -> None:
         unique=False,
         schema="ops",
     )
-    op.create_index(
-        "ix_ops_audit_logs_occurred_at", "audit_logs", ["occurred_at"], unique=False, schema="ops"
-    )
+    op.create_index("ix_ops_audit_logs_occurred_at", "audit_logs", ["occurred_at"], unique=False, schema="ops")
     op.create_table(
         "system_settings",
         sa.Column("key", sa.String(length=64), nullable=False),
@@ -153,12 +145,8 @@ def upgrade() -> None:
         sa.Column("username", sa.String(length=64), nullable=True),
         sa.Column("password_hash", sa.String(length=255), nullable=False),
         sa.Column("role", sa.String(length=16), nullable=False),
-        sa.Column(
-            "status", sa.String(length=24), server_default=sa.text("'ACTIVE'"), nullable=False
-        ),
-        sa.Column(
-            "failed_login_attempts", sa.Integer(), server_default=sa.text("0"), nullable=False
-        ),
+        sa.Column("status", sa.String(length=24), server_default=sa.text("'ACTIVE'"), nullable=False),
+        sa.Column("failed_login_attempts", sa.Integer(), server_default=sa.text("0"), nullable=False),
         sa.Column("locked_until", sa.DateTime(timezone=True), nullable=True),
         sa.Column("last_login_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("password_changed_at", sa.DateTime(timezone=True), nullable=True),
@@ -289,9 +277,7 @@ def upgrade() -> None:
         sa.Column("user_id", sa.UUID(), nullable=False),
         sa.Column("family_id", sa.UUID(), nullable=False),
         sa.Column("token_hash", sa.String(length=128), nullable=False),
-        sa.Column(
-            "issued_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False
-        ),
+        sa.Column("issued_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("expires_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("revoked_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("revoked_reason", sa.String(length=64), nullable=True),
@@ -445,9 +431,7 @@ def upgrade() -> None:
             ondelete="CASCADE",
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_teachers")),
-        sa.UniqueConstraint(
-            "institution_id", "display_code", name=op.f("uq_teachers_institution_id_display_code")
-        ),
+        sa.UniqueConstraint("institution_id", "display_code", name=op.f("uq_teachers_institution_id_display_code")),
         sa.UniqueConstraint("user_id", name=op.f("uq_teachers_user_id")),
         schema="identity",
     )
@@ -464,9 +448,7 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.Column("id", sa.UUID(), server_default=sa.text("gen_random_uuid()"), nullable=False),
-        sa.CheckConstraint(
-            "grade IN ('7', '8', '9')", name=op.f("ck_teacher_group_assignments_grade_allowed")
-        ),
+        sa.CheckConstraint("grade IN ('7', '8', '9')", name=op.f("ck_teacher_group_assignments_grade_allowed")),
         sa.ForeignKeyConstraint(
             ["institution_id"],
             ["identity.institutions.id"],
@@ -494,15 +476,11 @@ def upgrade() -> None:
 def downgrade() -> None:
     op.drop_table("teacher_group_assignments", schema="identity")
     op.drop_table("teachers", schema="identity")
-    op.drop_index(
-        "ix_identity_students_institution_grade_group", table_name="students", schema="identity"
-    )
+    op.drop_index("ix_identity_students_institution_grade_group", table_name="students", schema="identity")
     op.drop_table("students", schema="identity")
     op.drop_table("researchers", schema="identity")
     op.drop_index("ix_identity_refresh_tokens_user", table_name="refresh_tokens", schema="identity")
-    op.drop_index(
-        "ix_identity_refresh_tokens_family", table_name="refresh_tokens", schema="identity"
-    )
+    op.drop_index("ix_identity_refresh_tokens_family", table_name="refresh_tokens", schema="identity")
     op.drop_table("refresh_tokens", schema="identity")
     op.drop_index(
         "ix_identity_password_reset_tokens_user",

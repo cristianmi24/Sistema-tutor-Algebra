@@ -25,13 +25,21 @@ export interface RequestOptions {
   body?: unknown;
   signal?: AbortSignal;
   headers?: Record<string, string>;
+  /** No intentar renovar la sesión ante 401 (p.ej. el propio /auth/refresh). */
+  skipAuthRetry?: boolean;
 }
 
-/** Proveedor del access token (en memoria). Lo configura el store de sesión (Fase 2). */
+/** Proveedor del access token (en memoria). Lo configura el store de sesión. */
 let accessTokenProvider: () => string | null = () => null;
+/** Intenta renovar la sesión; devuelve true si hay un nuevo token. Lo configura el store de sesión. */
+let unauthorizedHandler: (() => Promise<boolean>) | null = null;
 
 export function setAccessTokenProvider(provider: () => string | null): void {
   accessTokenProvider = provider;
+}
+
+export function setUnauthorizedHandler(handler: (() => Promise<boolean>) | null): void {
+  unauthorizedHandler = handler;
 }
 
 async function parseError(response: Response): Promise<ApiError> {
@@ -49,11 +57,7 @@ async function parseError(response: Response): Promise<ApiError> {
   return new ApiError(response.status, "HTTP_ERROR", `Error ${response.status} al comunicarse con el servidor.`, requestId);
 }
 
-/**
- * Cliente HTTP tipado: valida la respuesta con un esquema Zod y normaliza los errores en ApiError.
- * `credentials: "include"` permite la cookie HttpOnly del refresh token (Fase 2).
- */
-export async function request<TSchema extends z.ZodType>(path: string, schema: TSchema, options: RequestOptions = {}): Promise<z.output<TSchema>> {
+async function doFetch(path: string, options: RequestOptions): Promise<Response> {
   const headers: Record<string, string> = { Accept: "application/json", ...options.headers };
   const token = accessTokenProvider();
   if (token) headers.Authorization = `Bearer ${token}`;
@@ -62,14 +66,26 @@ export async function request<TSchema extends z.ZodType>(path: string, schema: T
     headers["Content-Type"] = "application/json";
     body = JSON.stringify(options.body);
   }
-
-  const response = await fetch(`${config.apiBaseUrl}${path}`, {
+  return fetch(`${config.apiBaseUrl}${path}`, {
     method: options.method ?? "GET",
     headers,
     credentials: "include",
     ...(body !== undefined ? { body } : {}),
     ...(options.signal ? { signal: options.signal } : {}),
   });
+}
+
+/**
+ * Cliente HTTP tipado: valida la respuesta con un esquema Zod y normaliza los errores en ApiError.
+ * Ante un 401 con token presente, intenta renovar la sesión una vez y repite la petición.
+ */
+export async function request<TSchema extends z.ZodType>(path: string, schema: TSchema, options: RequestOptions = {}): Promise<z.output<TSchema>> {
+  let response = await doFetch(path, options);
+
+  if (response.status === 401 && !options.skipAuthRetry && unauthorizedHandler && accessTokenProvider()) {
+    const renewed = await unauthorizedHandler();
+    if (renewed) response = await doFetch(path, options);
+  }
 
   if (!response.ok) {
     throw await parseError(response);

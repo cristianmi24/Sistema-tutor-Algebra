@@ -339,3 +339,123 @@
   gap: var(--space-4);
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
 }
+
+/* ---------- Textarea / Checkbox / Steps / Table ---------- */
+.ds-textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: var(--line-height-body);
+}
+
+.ds-checkbox {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.ds-checkbox input {
+  width: 20px;
+  height: 20px;
+  margin-top: 3px;
+  accent-color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.ds-steps {
+  display: flex;
+  gap: var(--space-2);
+  padding: 0;
+  margin: 0 0 var(--space-6);
+  list-style: none;
+  counter-reset: step;
+}
+
+.ds-steps li {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-caption);
+  color: var(--color-muted);
+}
+
+.ds-steps li::before {
+  counter-increment: step;
+  content: counter(step);
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  font-weight: var(--font-weight-semibold);
+  flex-shrink: 0;
+}
+
+.ds-steps li[aria-current="step"] {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+}
+.ds-steps li[aria-current="step"]::before {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+.ds-steps li[data-done="true"]::before {
+  background: var(--color-success-soft);
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.legal-text {
+  max-height: 46vh;
+  overflow: auto;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+}
+.legal-text h2 {
+  font-size: var(--font-size-h3);
+}
+.legal-text h3 {
+  font-size: var(--font-size-body-lg);
+}
+
+.ds-table-wrap {
+  overflow-x: auto;
+}
+.ds-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-label);
+}
+.ds-table th,
+.ds-table td {
+  text-align: left;
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+}
+.ds-table th {
+  color: var(--color-muted);
+  font-weight: var(--font-weight-medium);
+}
+
+.ds-inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.ds-kpi {
+  display: grid;
+  gap: var(--space-1);
+}
+.ds-kpi__value {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}

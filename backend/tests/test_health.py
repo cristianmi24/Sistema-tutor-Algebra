@@ -67,9 +67,7 @@ async def test_meta_exposes_vocabularies_without_negative_labels(client: httpx.A
     assert body["student_state_labels"]["STAGNATION"] == "Buscando otro camino"
 
 
-async def test_readiness_reports_database(
-    client: httpx.AsyncClient, database_available: bool
-) -> None:
+async def test_readiness_reports_database(client: httpx.AsyncClient, database_available: bool) -> None:
     response = await client.get("/api/v1/health/ready")
     if database_available:
         assert response.status_code == 200

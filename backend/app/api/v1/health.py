@@ -38,9 +38,7 @@ async def health(settings: SettingsDep) -> HealthResponse:
     )
 
 
-@router.get(
-    "/ready", response_model=ReadinessResponse, summary="Disponibilidad de la base de datos"
-)
+@router.get("/ready", response_model=ReadinessResponse, summary="Disponibilidad de la base de datos")
 async def readiness(engine: EngineDep) -> ReadinessResponse:
     try:
         ok = await check_database(engine)

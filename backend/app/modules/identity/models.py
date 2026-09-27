@@ -51,9 +51,7 @@ class Institution(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     city: Mapped[str | None] = mapped_column(String(120))
     # Política de consentimiento requerida para menores,
     # p.ej. {"required_parties": ["STUDENT", "GUARDIAN"]}
-    consent_policy: Mapped[dict[str, Any]] = mapped_column(
-        JSONB, nullable=False, server_default=text("'{}'::jsonb")
-    )
+    consent_policy: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, server_default=text("'{}'::jsonb"))
     retention_days: Mapped[int | None] = mapped_column(Integer)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("true"))
 
@@ -78,12 +76,8 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     username: Mapped[str | None] = mapped_column(String(64), unique=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     role: Mapped[str] = mapped_column(String(16), nullable=False)
-    status: Mapped[str] = mapped_column(
-        String(24), nullable=False, server_default=text(f"'{UserStatus.ACTIVE.value}'")
-    )
-    failed_login_attempts: Mapped[int] = mapped_column(
-        Integer, nullable=False, server_default=text("0")
-    )
+    status: Mapped[str] = mapped_column(String(24), nullable=False, server_default=text(f"'{UserStatus.ACTIVE.value}'"))
+    failed_login_attempts: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("0"))
     locked_until: Mapped[datetime | None] = mapped_column()
     last_login_at: Mapped[datetime | None] = mapped_column()
     password_changed_at: Mapped[datetime | None] = mapped_column()
@@ -91,9 +85,7 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     institution: Mapped[Institution | None] = relationship(back_populates="users")
     student_profile: Mapped[Student | None] = relationship(back_populates="user", uselist=False)
     teacher_profile: Mapped[Teacher | None] = relationship(back_populates="user", uselist=False)
-    researcher_profile: Mapped[Researcher | None] = relationship(
-        back_populates="user", uselist=False
-    )
+    researcher_profile: Mapped[Researcher | None] = relationship(back_populates="user", uselist=False)
     consents: Mapped[list[Consent]] = relationship(back_populates="user")
 
 
@@ -103,10 +95,9 @@ class Student(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "students"
     __table_args__ = (
         CheckConstraint(_in_list("grade", values(Grade)), name="grade_allowed"),
+        CheckConstraint("research_status IN ('PENDING', 'ELIGIBLE', 'EXCLUDED')", name="research_status_allowed"),
         UniqueConstraint("institution_id", "participant_code"),
-        Index(
-            "ix_identity_students_institution_grade_group", "institution_id", "grade", "group_code"
-        ),
+        Index("ix_identity_students_institution_grade_group", "institution_id", "grade", "group_code"),
         {"schema": SCHEMA_IDENTITY},
     )
 
@@ -120,6 +111,9 @@ class Student(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     grade: Mapped[str] = mapped_column(String(2), nullable=False)
     group_code: Mapped[str | None] = mapped_column(String(16))
     birth_year: Mapped[int | None] = mapped_column(Integer)
+    # Participación efectiva en la investigación según la política de consentimiento de la
+    # institución: PENDING (falta alguna parte), ELIGIBLE, EXCLUDED (alguna parte declinó/revocó).
+    research_status: Mapped[str] = mapped_column(String(16), nullable=False, server_default=text("'PENDING'"))
 
     user: Mapped[User] = relationship(back_populates="student_profile")
 
@@ -223,9 +217,7 @@ class Consent(UUIDPrimaryKeyMixin, Base):
     revoked_at: Mapped[datetime | None] = mapped_column()
     # {"method": "web_form", "ip_truncated": "190.24.0.0", "user_agent": "...",
     #  "guardian_reference": "..."}
-    evidence: Mapped[dict[str, Any]] = mapped_column(
-        JSONB, nullable=False, server_default=text("'{}'::jsonb")
-    )
+    evidence: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, server_default=text("'{}'::jsonb"))
     created_at: Mapped[datetime] = mapped_column(server_default=text("now()"), nullable=False)
 
     user: Mapped[User] = relationship(back_populates="consents")

@@ -31,9 +31,7 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     api_prefix: str = "/api/v1"
     # NoDecode: los valores separados por coma se parsean en ``_split_csv`` (no como JSON).
-    cors_origins: Annotated[list[str], NoDecode] = Field(
-        default_factory=lambda: ["http://localhost:5173"]
-    )
+    cors_origins: Annotated[list[str], NoDecode] = Field(default_factory=lambda: ["http://localhost:5173"])
 
     # --- Base de datos -------------------------------------------------------
     database_url: str = "postgresql+psycopg://sti_app:sti_app_dev_password@localhost:5432/sti_dev"
@@ -56,6 +54,19 @@ class Settings(BaseSettings):
         default_factory=lambda: ["ADMIN", "TEACHER", "RESEARCHER", "STUDENT"]
     )
     rate_limit_auth: str = "10/minute"
+    rate_limit_enabled: bool = True
+    login_max_failed_attempts: int = 5
+    login_lockout_minutes: int = 15
+    refresh_cookie_name: str = "sti_refresh"
+    # URL pública del frontend (enlaces de recuperación de contraseña).
+    frontend_base_url: str = "http://localhost:5173"
+    # Correo: "console" registra en logs (desarrollo); "smtp" (Fase de despliegue) requiere SMTP_*.
+    email_backend: Literal["console", "memory"] = "console"
+    email_from: str = "no-reply@sti-ga.local"
+    # Ventana de eventos recientes para el motor adaptativo y umbrales.
+    tutor_window_size: int = 5
+    tutor_max_interventions_per_task: int = 4
+    tutor_teacher_pause_events: int = 3
 
     # --- Documentos legales --------------------------------------------------
     privacy_policy_version: str = "2026.1"
@@ -83,10 +94,7 @@ class Settings(BaseSettings):
         if value is None:
             return None
         if not value.startswith("postgresql+psycopg://"):
-            msg = (
-                "DATABASE_URL debe usar el driver psycopg 3: "
-                "'postgresql+psycopg://usuario:clave@host:puerto/base'"
-            )
+            msg = "DATABASE_URL debe usar el driver psycopg 3: 'postgresql+psycopg://usuario:clave@host:puerto/base'"
             raise ValueError(msg)
         return value
 

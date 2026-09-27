@@ -12,9 +12,7 @@ def _settings(**overrides: object) -> Settings:
 
 
 def test_csv_lists_are_parsed() -> None:
-    s = _settings(
-        cors_origins="http://a.test, http://b.test", password_reset_roles="ADMIN, TEACHER"
-    )
+    s = _settings(cors_origins="http://a.test, http://b.test", password_reset_roles="ADMIN, TEACHER")
     assert s.cors_origins == ["http://a.test", "http://b.test"]
     assert s.password_reset_roles == ["ADMIN", "TEACHER"]
 

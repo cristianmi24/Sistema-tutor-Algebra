@@ -1,6 +1,9 @@
 import { type RouteObject, createBrowserRouter, createMemoryRouter } from "react-router-dom";
 
+import { AdminAuditPage } from "@/features/admin/pages/AdminAuditPage";
 import { AdminDashboardPage } from "@/features/admin/pages/AdminDashboardPage";
+import { AdminInstitutionsPage } from "@/features/admin/pages/AdminInstitutionsPage";
+import { AdminUsersPage } from "@/features/admin/pages/AdminUsersPage";
 import { ForgotPasswordPage } from "@/features/auth/pages/ForgotPasswordPage";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { RegisterPage } from "@/features/auth/pages/RegisterPage";
@@ -13,18 +16,23 @@ import { AppShell } from "@/layouts/AppShell";
 import { AuthLayout } from "@/layouts/AuthLayout";
 import { NotFoundPage } from "@/layouts/NotFoundPage";
 
-import { RedirectToHome, RequireAuth, RequireRole } from "./guards";
+import { AnonymousOnly, RedirectToHome, RequireAuth, RequireRole } from "./guards";
 
 export const routes: RouteObject[] = [
   { path: "/", element: <RedirectToHome /> },
   { path: "/status", element: <StatusPage /> },
   {
-    element: <AuthLayout />,
+    element: <AnonymousOnly />,
     children: [
-      { path: "/login", element: <LoginPage /> },
-      { path: "/register", element: <RegisterPage /> },
-      { path: "/forgot-password", element: <ForgotPasswordPage /> },
-      { path: "/reset-password", element: <ResetPasswordPage /> },
+      {
+        element: <AuthLayout />,
+        children: [
+          { path: "/login", element: <LoginPage /> },
+          { path: "/register", element: <RegisterPage /> },
+          { path: "/forgot-password", element: <ForgotPasswordPage /> },
+          { path: "/reset-password", element: <ResetPasswordPage /> },
+        ],
+      },
     ],
   },
   {
@@ -39,7 +47,16 @@ export const routes: RouteObject[] = [
             element: <RequireRole roles={["RESEARCHER"]} />,
             children: [{ path: "/researcher/*", element: <ResearcherDashboardPage /> }],
           },
-          { element: <RequireRole roles={["ADMIN"]} />, children: [{ path: "/admin/*", element: <AdminDashboardPage /> }] },
+          {
+            element: <RequireRole roles={["ADMIN"]} />,
+            children: [
+              { path: "/admin", element: <AdminDashboardPage /> },
+              { path: "/admin/users", element: <AdminUsersPage /> },
+              { path: "/admin/institutions", element: <AdminInstitutionsPage /> },
+              { path: "/admin/audit", element: <AdminAuditPage /> },
+              { path: "/admin/*", element: <AdminDashboardPage /> },
+            ],
+          },
         ],
       },
     ],
