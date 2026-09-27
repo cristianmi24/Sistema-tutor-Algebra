@@ -42,14 +42,27 @@ pytest                            # usa TEST_DATABASE_URL (o DATABASE_URL); omit
 
 ```text
 app/
-  main.py               # create_app(), lifespan, routers
-  core/                 # config, database, logging, errors, middleware, deps
-  api/v1/               # routers: health, meta (Fase 1)
+  main.py                 # create_app(): middleware, rate limiting, errores, routers, política del tutor, IA
+  cli.py                  # seed-demo · retention
+  core/                   # config, database, logging, errors, middleware, security, auth (RBAC), cookies, ratelimit
+  api/v1/                 # health, meta, auth, legal, consents, admin, tasks, sessions, catalog, tutor, research, teacher, ai
   modules/
-    common/enums.py     # vocabularios cerrados (roles, estados, eventos, tipos de tarea…)
-    identity/models.py  # esquema identity (PII): instituciones, usuarios, perfiles, consentimientos, tokens
-    ops/models.py       # esquema ops: audit_logs (append-only), system_settings
-  models.py             # registro de modelos para Alembic
-alembic/                # migraciones (env async con creación de esquemas)
-tests/                  # pytest (+ PostgreSQL opcional)
+    common/enums.py       # vocabularios cerrados
+    identity/             # PII: modelos, servicios de auth/consentimiento, privacidad (anonimización, retención), correo
+    learning/             # tareas, sesiones, eventos append-only, evaluador de dominio, alcance por rol
+    tutor/                # motor puro: evidence, bayes, rules, scaffolding, decision + orquestador y configuración
+    research/             # episodios, timeline, comparación, memos, entrevistas, exportación
+    teacher/              # panorama de grupos e intervenciones
+    ai/                   # proveedores LLM, validadores, servicio con respaldo
+    ops/                  # auditoría
+  seed/                   # documentos legales, catálogo pedagógico, reglas y Bayes, datos demo
+alembic/versions/         # 0001–0006
+tests/                    # 100 pruebas (PostgreSQL)
+```
+
+## IA opcional
+
+```bash
+uv pip install -e ".[ai]"
+# .env: LLM_ENABLED=true, LLM_PROVIDER=anthropic, LLM_API_KEY=..., LLM_MODEL=claude-opus-5
 ```

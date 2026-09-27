@@ -11,7 +11,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -43,12 +43,21 @@ from app.modules.learning.schemas import (
 
 
 async def _next_sequence(db: AsyncSession, session: LearningSession) -> int:
-    """Secuencia monótona por sesión; bloquea la fila de la sesión para serializar."""
-    locked = await db.execute(select(LearningSession).where(LearningSession.id == session.id).with_for_update())
-    row = locked.scalar_one()
-    row.last_sequence += 1
-    session.last_sequence = row.last_sequence
-    return row.last_sequence
+    """Secuencia monótona por sesión con incremento atómico en la base de datos.
+
+    ``UPDATE ... RETURNING`` bloquea la fila y lee el valor confirmado, por lo que dos eventos
+    simultáneos de la misma sesión nunca obtienen el mismo número (evita condiciones de carrera).
+    """
+    result = await db.execute(
+        update(LearningSession)
+        .where(LearningSession.id == session.id)
+        .values(last_sequence=LearningSession.last_sequence + 1)
+        .returning(LearningSession.last_sequence)
+        .execution_options(synchronize_session=False)
+    )
+    value = int(result.scalar_one())
+    session.last_sequence = value
+    return value
 
 
 async def record_event(

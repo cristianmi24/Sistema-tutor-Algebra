@@ -323,3 +323,39 @@ async def test_scope_is_enforced_for_sessions(
         headers=teacher,
     )
     assert denied.status_code == 403
+
+
+async def test_concurrent_events_get_unique_sequences(
+    settings: object, world: SeededWorld, catalog: dict[str, str], engine: object
+) -> None:
+    """Eventos simultáneos de la misma sesión (varias pestañas o peticiones en paralelo) no colisionan."""
+    import asyncio
+
+    from app.modules.common.enums import InteractionEventType
+    from app.modules.identity.models import Student
+    from app.modules.learning.schemas import SessionCreate
+    from app.modules.learning.service import load_session, record_event, start_session
+    from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker
+
+    assert isinstance(engine, AsyncEngine)
+    factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with factory() as db:
+        student = await db.get(Student, uuid.UUID(world.student_id))
+        assert student is not None
+        session = await start_session(db, student, SessionCreate(task_codes=["A-NUM-01"]))
+        await db.commit()
+        session_id = session.id
+
+    async def emit() -> None:
+        async with factory() as db:
+            loaded = await load_session(db, session_id)
+            await record_event(db, loaded, InteractionEventType.TASK_OPENED, task_id=loaded.tasks[0].task_id)
+            await asyncio.sleep(0.01)
+            await db.commit()
+
+    await asyncio.gather(*(emit() for _ in range(8)))
+    async with factory() as db:
+        sequences = list(
+            (await db.execute(select(Interaction.sequence).where(Interaction.session_id == session_id))).scalars()
+        )
+    assert sorted(sequences) == list(range(1, 10))

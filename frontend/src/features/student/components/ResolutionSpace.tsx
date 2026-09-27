@@ -121,6 +121,7 @@ export function QuestionBlock({ question, pattern, attempts, submitting, onSubmi
   const [value, setValue] = useState("");
   const [expression, setExpression] = useState("");
   const [table, setTable] = useState<Record<string, string>>({});
+  const [empty, setEmpty] = useState(false);
   const positions = question.positions ?? [1, 2, 3, 4, 5];
 
   const switchRepresentation = (next: Representation) => {
@@ -129,25 +130,20 @@ export function QuestionBlock({ question, pattern, attempts, submitting, onSubmi
     onRepresentationChange(next);
   };
 
+  const buildDraft = (): ResponseDraft | null => {
+    if (representation === "VERBAL") return text.trim() ? { representation, content: { text: text.trim() } } : null;
+    if (representation === "NUMERIC") return value.trim() ? { representation, content: { value: value.trim() } } : null;
+    if (representation === "SYMBOLIC") return expression.trim() ? { representation, content: { expression: expression.trim() } } : null;
+    const filled = positions.filter((p) => (table[String(p)] ?? "").trim() !== "");
+    if (!filled.length) return null;
+    if (representation === "TABULAR") return { representation, content: { rows: filled.map((p) => ({ n: p, value: (table[String(p)] ?? "").trim() })) } };
+    return { representation, content: { points: filled.map((p) => ({ x: p, y: (table[String(p)] ?? "").trim() })) } };
+  };
+
   const submit = () => {
-    if (representation === "VERBAL") {
-      if (!text.trim()) return;
-      onSubmit({ representation, content: { text: text.trim() } });
-    } else if (representation === "NUMERIC") {
-      if (!value.trim()) return;
-      onSubmit({ representation, content: { value: value.trim() } });
-    } else if (representation === "SYMBOLIC") {
-      if (!expression.trim()) return;
-      onSubmit({ representation, content: { expression: expression.trim() } });
-    } else if (representation === "TABULAR") {
-      const rows = positions.filter((p) => (table[String(p)] ?? "").trim() !== "").map((p) => ({ n: p, value: (table[String(p)] ?? "").trim() }));
-      if (!rows.length) return;
-      onSubmit({ representation, content: { rows } });
-    } else {
-      const points = positions.filter((p) => (table[String(p)] ?? "").trim() !== "").map((p) => ({ x: p, y: (table[String(p)] ?? "").trim() }));
-      if (!points.length) return;
-      onSubmit({ representation, content: { points } });
-    }
+    const draft = buildDraft();
+    setEmpty(draft === null);
+    if (draft) onSubmit(draft);
   };
 
   return (
@@ -225,6 +221,11 @@ export function QuestionBlock({ question, pattern, attempts, submitting, onSubmi
             onEdit();
           }}
         />
+      )}
+      {empty && (
+        <p className="ds-field__error" role="alert">
+          Escribe tu respuesta antes de registrarla.
+        </p>
       )}
       <div className="ds-inline-actions">
         <Button onClick={submit} loading={submitting}>

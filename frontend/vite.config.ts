@@ -20,6 +20,20 @@ export default defineConfig({
   build: {
     sourcemap: false,
     target: "es2022",
+    rollupOptions: {
+      output: {
+        // Librerías en chunks estables (mejor caché entre despliegues).
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return undefined;
+          if (/[\\/](react|react-dom|scheduler)[\\/]/.test(id)) return "vendor-react";
+          if (id.includes("react-router")) return "vendor-router";
+          if (id.includes("@tanstack")) return "vendor-query";
+          if (id.includes("zod") || id.includes("react-hook-form") || id.includes("@hookform")) return "vendor-forms";
+          if (id.includes("lucide-react")) return "vendor-icons";
+          return "vendor";
+        },
+      },
+    },
   },
   test: {
     environment: "jsdom",

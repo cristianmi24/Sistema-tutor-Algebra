@@ -101,7 +101,8 @@ async def update_institution(
 
 @router.get("/users", response_model=Page[UserSummary])
 async def list_users(
-    _: AdminDep,
+    request: Request,
+    admin: AdminDep,
     db: DbDep,
     role: Role | None = None,
     institution_id: uuid.UUID | None = None,
@@ -124,7 +125,19 @@ async def list_users(
     rows = (
         await db.execute(stmt.order_by(User.created_at.desc()).offset((page - 1) * page_size).limit(page_size))
     ).scalars()
-    return Page(items=[service.user_summary(u) for u in rows], page=page, page_size=page_size, total=total)
+    items = [service.user_summary(u) for u in rows]
+    # Acceso a datos personales (correo/usuario): queda auditado.
+    await record_audit(
+        db,
+        action=AuditAction.PII_ACCESSED,
+        outcome=AuditOutcome.SUCCESS,
+        actor_user_id=admin.id,
+        actor_role=admin.role.value,
+        resource_type="user_list",
+        details={"count": len(items), "role_filter": role.value if role else None},
+        request=request,
+    )
+    return Page(items=items, page=page, page_size=page_size, total=total)
 
 
 @router.post("/users", response_model=UserSummary, status_code=status.HTTP_201_CREATED)
@@ -138,6 +151,26 @@ async def update_status(
     request: Request, user_id: uuid.UUID, payload: UserStatusUpdate, admin: AdminDep, db: DbDep
 ) -> UserSummary:
     user = await service.set_user_status(db, user_id=user_id, status=payload.status, actor=admin, request=request)
+    return service.user_summary(user)
+
+
+@router.post(
+    "/users/{user_id}/anonymize",
+    response_model=UserSummary,
+    summary="Anonimizar una cuenta (solicitud de supresión); conserva datos pseudonimizados de investigación",
+)
+async def anonymize(request: Request, user_id: uuid.UUID, admin: AdminDep, db: DbDep) -> UserSummary:
+    from app.core.auth import load_user
+    from app.core.errors import AppError
+    from app.modules.identity.privacy import anonymize_user
+
+    user = await load_user(db, user_id)
+    if user is None:
+        raise NotFoundError("Usuario no encontrado.")
+    try:
+        await anonymize_user(db, user, reason="solicitud del titular", actor_id=admin.id, actor_role=admin.role.value)
+    except ValueError as exc:
+        raise AppError(str(exc)) from exc
     return service.user_summary(user)
 
 

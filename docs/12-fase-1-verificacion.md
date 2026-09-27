@@ -85,6 +85,8 @@ smoke:    GET /api/v1/health        → 200 {"status":"ok",...} + X-Request-ID +
 
 ## 5. Pendientes conscientes y decisiones
 
+> Actualización: todos estos puntos se resolvieron en las Fases 2–8 (ver `13-fases-2-8-verificacion.md`); la inmutabilidad de tablas se aplicó con disparadores de base de datos en lugar de `GRANT`.
+
 - Las páginas de autenticación son estructura visual (botón deshabilitado con aviso explícito) hasta la Fase 2.
 - `learning`/`research` existen como esquemas vacíos: sus tablas llegan con las Fases 3–5 en migraciones propias.
 - `GRANT` de solo `INSERT/SELECT` sobre tablas append-only se añadirá en una migración de endurecimiento al desplegar (requiere el rol `sti_app` distinto del propietario).

@@ -11,17 +11,21 @@ from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
-from app.core.config import Settings, get_settings
+from app.core.config import Settings
 from app.core.errors import error_payload
 
 limiter = Limiter(key_func=get_remote_address, headers_enabled=True)
+_auth_limit = "10/minute"
 
 
 def auth_limit() -> str:
-    return get_settings().rate_limit_auth
+    """Límite de endpoints de autenticación de la aplicación en ejecución (configurable)."""
+    return _auth_limit
 
 
 def register_rate_limiting(app: FastAPI, settings: Settings) -> None:
+    global _auth_limit
+    _auth_limit = settings.rate_limit_auth
     limiter.enabled = settings.rate_limit_enabled
     app.state.limiter = limiter
 

@@ -54,6 +54,10 @@ export function AdminUsersPage() {
       void queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
     },
   });
+  const anonymize = useMutation({
+    mutationFn: (id: string) => adminApi.anonymize(id),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["admin", "users"] }),
+  });
   const toggle = useMutation({
     mutationFn: ({ id, status }: { id: string; status: "ACTIVE" | "DISABLED" }) => adminApi.setUserStatus(id, status),
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["admin", "users"] }),
@@ -83,6 +87,7 @@ export function AdminUsersPage() {
         >
           {users.isPending && <Skeleton height="8rem" />}
           {users.isError && <Alert tone="error">{errorMessage(users.error)}</Alert>}
+          {anonymize.isError && <Alert tone="error">{errorMessage(anonymize.error)}</Alert>}
           {users.data && (
             <div className="ds-table-wrap">
               <table className="ds-table">
@@ -113,7 +118,20 @@ export function AdminUsersPage() {
                           }}
                         >
                           {u.status === "DISABLED" ? "Reactivar" : "Deshabilitar"}
-                        </Button>
+                        </Button>{" "}
+                        {!u.username?.startsWith("anon-") && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              if (window.confirm(`¿Anonimizar ${u.display_code}? Se eliminan sus datos personales de forma irreversible; sus registros de investigación quedan con el código.`)) {
+                                anonymize.mutate(u.id);
+                              }
+                            }}
+                          >
+                            Anonimizar
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   ))}

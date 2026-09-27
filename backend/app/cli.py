@@ -64,11 +64,30 @@ async def seed_demo() -> None:
     print(f"estudiante1..3 (contraseña: variable {DEMO_PASSWORD_ENV} o la de demostración).")
 
 
+async def retention(dry_run: bool) -> None:
+    from app.modules.identity.privacy import apply_retention
+
+    settings = get_settings()
+    engine = build_engine(settings)
+    factory = build_session_factory(engine)
+    async with factory() as db:
+        affected = await apply_retention(db, dry_run=dry_run)
+        if dry_run:
+            await db.rollback()
+        else:
+            await db.commit()
+    await engine.dispose()
+    print(f"{'[simulación] ' if dry_run else ''}Cuentas anonimizadas: {len(affected)}")
+
+
 def main(argv: list[str]) -> None:
-    if len(argv) < 2 or argv[1] not in {"seed-demo"}:
+    if len(argv) < 2 or argv[1] not in {"seed-demo", "retention"}:
         print(__doc__)
         raise SystemExit(1)
-    asyncio.run(seed_demo())
+    if argv[1] == "seed-demo":
+        asyncio.run(seed_demo())
+    else:
+        asyncio.run(retention(dry_run="--dry-run" in argv))
 
 
 if __name__ == "__main__":

@@ -56,10 +56,12 @@ Cada llamada crea un registro en `learning.ai_interactions`: proveedor, modelo, 
 class LLMProvider(Protocol):
     async def complete(self, request: LLMRequest) -> LLMResponse: ...
 
-# Implementaciones: NullProvider (por defecto), AnthropicProvider, OpenAICompatibleProvider (configurable)
+# Implementaciones: NullProvider (por defecto), AnthropicProvider (SDK oficial `anthropic`), FakeProvider (solo pruebas)
 ```
 
-Configuración: `LLM_ENABLED`, `LLM_PROVIDER`, `LLM_MODEL`, `LLM_API_KEY` (solo backend), `LLM_TIMEOUT_MS`, `LLM_MAX_CALLS_PER_SESSION`. Sin clave o con proveedor `null` la plataforma opera sin IA sin cambios funcionales.
+Configuración: `LLM_ENABLED`, `LLM_PROVIDER` (`null` | `anthropic`), `LLM_MODEL` (por defecto `claude-opus-5`), `LLM_API_KEY` (solo backend), `LLM_TIMEOUT_MS`, `LLM_MAX_CALLS_PER_SESSION`. Sin clave o con proveedor `null` la plataforma opera sin IA sin cambios funcionales.
+
+Implementación (Fase 7): `backend/app/modules/ai/`. El proveedor de Anthropic usa salida estructurada por esquema JSON (`output_config.format`), esfuerzo `low`, respaldo del servidor ante rechazos (`fallbacks: "default"`), comprobación de `stop_reason` y tiempo límite corto. Usos implementados: `ADAPT_LANGUAGE` ("dímelo de otra forma") e `INTERPRET_OPEN_ANSWER` (autoexplicaciones y respuestas verbales, solo visibles para el personal). Instalación: `uv pip install -e ".[ai]"`.
 
 ## 7. Criterio de adopción (Fase 7)
 

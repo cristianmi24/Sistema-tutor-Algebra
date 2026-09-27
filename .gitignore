@@ -29,3 +29,4 @@ frontend/coverage/
 .idea/
 .vscode/
 *.swp
+frontend/e2e/screenshots/

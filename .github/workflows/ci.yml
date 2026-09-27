@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "claude/**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: sti
+          POSTGRES_PASSWORD: sti_ci_password
+          POSTGRES_DB: sti_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U sti" --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql+psycopg://sti:sti_ci_password@localhost:5432/sti_test
+      DATABASE_URL: postgresql+psycopg://sti:sti_ci_password@localhost:5432/sti_test
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv venv --python 3.11 && uv pip install -e ".[dev]"
+      - run: .venv/bin/ruff check . && .venv/bin/ruff format --check .
+      - run: .venv/bin/mypy
+      - run: .venv/bin/alembic upgrade head && .venv/bin/alembic check
+      - run: .venv/bin/pytest
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run check

@@ -26,7 +26,7 @@ Escala fluida con `clamp()` en móviles.
 | Token | Claro | Oscuro | Uso |
 |-------|-------|--------|-----|
 | `--color-primary` | **Índigo `#4F46E5`** | `#818CF8` | Acciones principales, enlaces, foco |
-| `--color-secondary` | **Teal 600 `#0D9488`** | `#2DD4BF` | Representaciones, exploración |
+| `--color-secondary` | **Teal `#0F766E`** | `#2DD4BF` | Representaciones, exploración |
 | `--color-success` | `#15803D` | `#4ADE80` | Confirmaciones |
 | `--color-warning` | `#B45309` | `#FBBF24` | Avisos (nunca para "castigar") |
 | `--color-error` | `#B91C1C` | `#F87171` | Errores de sistema/formulario |

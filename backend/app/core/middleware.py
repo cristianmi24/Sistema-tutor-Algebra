@@ -17,6 +17,7 @@ from app.core.logging import get_logger, request_id_ctx
 log = get_logger("app.access")
 
 REQUEST_ID_HEADER = "X-Request-ID"
+MAX_BODY_BYTES = 1_000_000  # 1 MB: suficiente para cualquier respuesta o memo; evita abusos.
 
 SECURITY_HEADERS: dict[str, str] = {
     "X-Content-Type-Options": "nosniff",
@@ -39,6 +40,24 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
         request_id = incoming if 0 < len(incoming) <= 64 and incoming.isprintable() else uuid.uuid4().hex
         token = request_id_ctx.set(request_id)
         started = time.perf_counter()
+        length = request.headers.get("content-length")
+        if length is not None and (not length.isdigit() or int(length) > MAX_BODY_BYTES):
+            request_id_ctx.reset(token)
+            from fastapi.responses import JSONResponse
+
+            too_large = JSONResponse(
+                status_code=413,
+                content={
+                    "error": {
+                        "code": "PAYLOAD_TOO_LARGE",
+                        "message": "La petición es demasiado grande.",
+                        "request_id": request_id,
+                        "details": None,
+                    }
+                },
+            )
+            too_large.headers[REQUEST_ID_HEADER] = request_id
+            return too_large
         try:
             response = await call_next(request)
         finally:

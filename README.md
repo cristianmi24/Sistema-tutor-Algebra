@@ -11,9 +11,14 @@ Plataforma web de **investigación educativa** con un **Sistema Tutor Inteligent
 | Fase | Estado |
 |------|--------|
 | 0 · Arquitectura | ✅ [`docs/`](docs/README.md) |
-| 1 · Fundación técnica | ✅ backend FastAPI + frontend React + PostgreSQL/Alembic + design system ([verificación](docs/12-fase-1-verificacion.md)) |
-| 2 · Autenticación y consentimiento | ⏳ siguiente |
-| 3 → 8 | planificadas en [`docs/09-plan-de-desarrollo.md`](docs/09-plan-de-desarrollo.md) |
+| 1 · Fundación técnica | ✅ [verificación](docs/12-fase-1-verificacion.md) |
+| 2 · Autenticación, RBAC y consentimiento | ✅ |
+| 3 · Módulo estudiante | ✅ |
+| 4 · Motor adaptativo (evidencias, Bayes, reglas, andamiaje, fading) | ✅ |
+| 5 · Investigación (episodios, timeline, memos, entrevistas, exportación) | ✅ |
+| 6 · Docente | ✅ |
+| 7 · IA opcional validada | ✅ |
+| 8 · Seguridad y pruebas | ✅ [verificación fases 2–8](docs/13-fases-2-8-verificacion.md) |
 
 ## Estructura
 
@@ -34,6 +39,7 @@ docker compose up -d postgres
 cd backend && cp .env.example .env
 uv venv && uv pip install -e ".[dev]"
 .venv/bin/alembic upgrade head
+.venv/bin/python -m app.cli seed-demo                   # cuentas y catálogo de demostración
 .venv/bin/uvicorn app.main:app --reload --port 8000     # http://localhost:8000/docs
 
 # 3) Frontend (otra terminal)
@@ -41,12 +47,15 @@ cd frontend && cp .env.example .env
 npm ci && npm run dev                                   # http://localhost:5173  (estado: /status)
 ```
 
+Cuentas de demostración (contraseña `Demo-STI-GA-2026!`): `admin@demo.edu`, `docente@demo.edu`, `investigadora@demo.edu`, `estudiante1..3`.
+
 ## Verificaciones
 
 ```bash
 make check
 # backend:  ruff · mypy · pytest (con PostgreSQL: migración upgrade/downgrade + deriva de modelos)
-# frontend: tsc --noEmit · eslint · vitest · vite build
+# frontend: tsc --noEmit · eslint · vitest (incluye accesibilidad) · vite build · secretos en el bundle
+# e2e:      npm run e2e  (Chromium local; ver docs/13)
 ```
 
 ## Principios no negociables

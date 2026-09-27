@@ -1,5 +1,5 @@
 # Atajos de desarrollo. Requiere: uv, node >= 20.19, docker (opcional).
-.PHONY: help db-up db-down backend-install backend-dev backend-test backend-lint migrate frontend-install frontend-dev frontend-check check
+.PHONY: seed retention e2e help db-up db-down backend-install backend-dev backend-test backend-lint migrate frontend-install frontend-dev frontend-check check
 
 help:
 	@echo "db-up / db-down        PostgreSQL local (docker compose)"
@@ -44,3 +44,12 @@ frontend-check:
 	cd frontend && npm run check
 
 check: backend-lint backend-test frontend-check
+
+seed:
+	cd backend && .venv/bin/python -m app.cli seed-demo
+
+retention:
+	cd backend && .venv/bin/python -m app.cli retention --dry-run
+
+e2e:
+	cd frontend && npm run e2e

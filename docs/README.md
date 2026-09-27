@@ -17,6 +17,7 @@ Esta carpeta contiene la **Fase 0 (Arquitectura)** del proyecto y se actualiza e
 | 10 | [Riesgos](10-riesgos.md) | Técnicos, pedagógicos, metodológicos, seguridad, privacidad, IA |
 | 11 | [Decisiones de arquitectura (ADR)](11-decisiones-adr.md) | Registro de decisiones tecnológicas y su justificación |
 | 12 | [Fase 1 — Verificación](12-fase-1-verificacion.md) | Qué se construyó en la Fase 1, cómo ejecutarlo y cómo se verificó |
+| 13 | [Fases 2–8 — Verificación](13-fases-2-8-verificacion.md) | Entregables por fase, casos C.43 ↔ pruebas, checklist C.44, hallazgos de la prueba de extremo a extremo |
 
 Principio rector de todo el sistema:
 

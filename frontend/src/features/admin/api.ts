@@ -60,6 +60,7 @@ export const adminApi = {
   createUser: (payload: StaffUserCreate) => request("/admin/users", userSummarySchema, { method: "POST", body: payload }),
   setUserStatus: (userId: string, status: "ACTIVE" | "DISABLED") =>
     request(`/admin/users/${userId}/status`, userSummarySchema, { method: "PATCH", body: { status } }),
+  anonymize: (userId: string) => request(`/admin/users/${userId}/anonymize`, userSummarySchema, { method: "POST" }),
   institutions: () => request("/admin/institutions", z.array(institutionSchema)),
   createInstitution: (payload: InstitutionIn) => request("/admin/institutions", institutionSchema, { method: "POST", body: payload }),
   audit: (params: { action?: string | undefined; page?: number | undefined; page_size?: number | undefined }) => request(`/admin/audit${qs(params)}`, pageSchema(auditLogSchema)),
