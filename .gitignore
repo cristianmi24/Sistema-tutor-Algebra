@@ -1,0 +1,31 @@
+# --- General ---
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+
+# --- Python / FastAPI ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+dist/
+build/
+*.egg-info/
+
+# --- Node / React ---
+node_modules/
+frontend/dist/
+frontend/coverage/
+.vite/
+
+# --- Editors ---
+.idea/
+.vscode/
+*.swp

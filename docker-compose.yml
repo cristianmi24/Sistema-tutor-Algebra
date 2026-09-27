@@ -1,0 +1,22 @@
+# PostgreSQL 16 local para desarrollo. En producción se usa Supabase (ver backend/README.md).
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sti-ga-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_dev_password
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - sti_pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  sti_pgdata:

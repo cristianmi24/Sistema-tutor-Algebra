@@ -1,0 +1,160 @@
+/* =====================================================================
+   STI-GA · Design tokens
+   Una sola tipografía (Lexend, autoalojada) y una paleta con roles
+   semánticos. Los estados NUNCA se comunican solo por color.
+   ===================================================================== */
+
+:root {
+  color-scheme: light dark;
+
+  /* --- Tipografía ---------------------------------------------------- */
+  --font-family: "Lexend Variable", system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-size-h1: clamp(1.75rem, 1.4rem + 1.2vw, 2rem);
+  --line-height-h1: 1.25;
+  --font-size-h2: clamp(1.375rem, 1.2rem + 0.6vw, 1.5rem);
+  --line-height-h2: 1.33;
+  --font-size-h3: 1.25rem;
+  --line-height-h3: 1.4;
+  --font-size-body: 1rem;
+  --line-height-body: 1.625;
+  --font-size-body-lg: 1.125rem;
+  --line-height-body-lg: 1.55;
+  --font-size-caption: 0.8125rem;
+  --line-height-caption: 1.4;
+  --font-size-label: 0.875rem;
+  --line-height-label: 1.43;
+  --font-size-button: 0.9375rem;
+  --line-height-button: 1.33;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  /* --- Espaciado (escala 4 px) ---------------------------------------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* --- Radios y sombras ------------------------------------------------ */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+  --shadow-sm: 0 1px 2px rgb(22 26 46 / 6%), 0 1px 3px rgb(22 26 46 / 8%);
+  --shadow-md: 0 6px 20px rgb(22 26 46 / 10%);
+
+  /* --- Movimiento ------------------------------------------------------ */
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* --- Layout ---------------------------------------------------------- */
+  --sidebar-width: 264px;
+  --topbar-height: 64px;
+  --content-max-width: 1200px;
+
+  /* --- Paleta (modo claro) -------------------------------------------- */
+  --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
+  --color-primary-soft: #e0e7ff;
+  --color-on-primary: #ffffff;
+
+  --color-secondary: #0d9488;
+  --color-secondary-soft: #ccfbf1;
+  --color-on-secondary: #ffffff;
+
+  --color-success: #15803d;
+  --color-success-soft: #dcfce7;
+  --color-warning: #b45309;
+  --color-warning-soft: #fef3c7;
+  --color-error: #b91c1c;
+  --color-error-soft: #fee2e2;
+  --color-info: #0369a1;
+  --color-info-soft: #e0f2fe;
+
+  /* Intervención del DOCENTE: siempre distinta de la del sistema (info). */
+  --color-teacher: #7c3aed;
+  --color-teacher-soft: #ede9fe;
+
+  --color-background: #f6f7fb;
+  --color-surface: #ffffff;
+  --color-surface-2: #f1f2f8;
+  --color-text: #161a2e;
+  --color-muted: #5c6280;
+  --color-border: #e1e4f0;
+  --color-focus: #4f46e5;
+
+  --pattern-dot: rgb(79 70 229 / 8%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-primary: #818cf8;
+    --color-primary-hover: #a5b4fc;
+    --color-primary-soft: #2a2f5c;
+    --color-on-primary: #0f1220;
+
+    --color-secondary: #2dd4bf;
+    --color-secondary-soft: #123f3a;
+    --color-on-secondary: #0f1220;
+
+    --color-success: #4ade80;
+    --color-success-soft: #14321f;
+    --color-warning: #fbbf24;
+    --color-warning-soft: #3a2b0c;
+    --color-error: #f87171;
+    --color-error-soft: #3f1515;
+    --color-info: #38bdf8;
+    --color-info-soft: #0f2b3d;
+
+    --color-teacher: #a78bfa;
+    --color-teacher-soft: #2b2050;
+
+    --color-background: #0f1220;
+    --color-surface: #181c2e;
+    --color-surface-2: #1f2440;
+    --color-text: #eef0fa;
+    --color-muted: #a3a9c4;
+    --color-border: #2a3050;
+    --color-focus: #a5b4fc;
+
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 40%);
+    --shadow-md: 0 8px 24px rgb(0 0 0 / 50%);
+    --pattern-dot: rgb(129 140 248 / 10%);
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-primary: #818cf8;
+  --color-primary-hover: #a5b4fc;
+  --color-primary-soft: #2a2f5c;
+  --color-on-primary: #0f1220;
+  --color-secondary: #2dd4bf;
+  --color-secondary-soft: #123f3a;
+  --color-on-secondary: #0f1220;
+  --color-success: #4ade80;
+  --color-success-soft: #14321f;
+  --color-warning: #fbbf24;
+  --color-warning-soft: #3a2b0c;
+  --color-error: #f87171;
+  --color-error-soft: #3f1515;
+  --color-info: #38bdf8;
+  --color-info-soft: #0f2b3d;
+  --color-teacher: #a78bfa;
+  --color-teacher-soft: #2b2050;
+  --color-background: #0f1220;
+  --color-surface: #181c2e;
+  --color-surface-2: #1f2440;
+  --color-text: #eef0fa;
+  --color-muted: #a3a9c4;
+  --color-border: #2a3050;
+  --color-focus: #a5b4fc;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 40%);
+  --shadow-md: 0 8px 24px rgb(0 0 0 / 50%);
+  --pattern-dot: rgb(129 140 248 / 10%);
+}
